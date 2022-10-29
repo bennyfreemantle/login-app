@@ -13,8 +13,6 @@ import argon2 from "argon2";
 // }
 
 // Create a new user in our database
-// TODO: Validate the name
-// TODO: Validate the email doesn't exist
 export async function createUser(name, email, password) {
     // Validate if name, email and password were all passed
     if (!name || !email || !password) {
@@ -34,7 +32,7 @@ export async function createUser(name, email, password) {
 
     // query the db for username
     const nameExists = await query(
-        `SELECT user_name FROM users WHERE user_name = $1;`,
+        `SELECT user_name FROM users WHERE LOWER(user_name) = LOWER($1);`,
         [name]
     );
 
@@ -57,15 +55,23 @@ export async function createUser(name, email, password) {
     // https://www.npmjs.com/package/argon2
     // Hash our password using argon2
     // argon2id already salts our hash for increased security
+    let hashedPassword = "";
     try {
-        const hash = await argon2.hash(password, { type: argon2.argon2id });
-        console.log(hash);
+        hashedPassword = await argon2.hash(password, {
+            type: argon2.argon2id,
+        });
+        console.log(hashedPassword);
     } catch (error) {
         console.log(error);
     }
 
-    // const result = await query(
-    //     `INSERT INTO users (user_name, user_email, user_password) VALUES ($1, $2, $3) RETURNING *;`,
-    //     [name, email, password]
-    // );
+    try {
+        const user = await query(
+            `INSERT INTO users (user_name, user_email, user_password) VALUES ($1, $2, $3) RETURNING *;`,
+            [name, email, hashedPassword]
+        );
+        return user.rows[0];
+    } catch (error) {
+        console.log(error);
+    }
 }

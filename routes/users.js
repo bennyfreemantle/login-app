@@ -13,10 +13,9 @@ const userRouter = express.Router();
 userRouter.post("/", async (req, res) => {
     const { user_name, user_email, user_password } = req.body;
     try {
-        await createUser(user_name, user_email, user_password);
+        const user = await createUser(user_name, user_email, user_password);
         res.status(200).json({
-            user_name,
-            user_email,
+            user,
         });
     } catch (error) {
         res.status(400).json({
