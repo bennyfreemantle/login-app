@@ -2,18 +2,8 @@ import query from "../db/index.js";
 import validator from "validator";
 import argon2 from "argon2";
 
-// ! REMOVE BEFORE PROD - GETS ALL USERS IN DB
-// export async function getUsers() {
-//   const result = await query(`SELECT * FROM users;`);
-//   const users = result.rows;
-//   return {
-//     success: true,
-//     payload: users,
-//   };
-// }
-
 // Create a new user in our database
-export async function createUser(name, email, password) {
+export async function signUpUser(name, email, password) {
     // Validate if name, email and password were all passed
     if (!name || !email || !password) {
         throw Error("All fields must be filled");
@@ -52,7 +42,8 @@ export async function createUser(name, email, password) {
         throw Error("Email is already in use by another user");
     }
 
-    // https://www.npmjs.com/package/argon2
+    // * https://www.npmjs.com/package/argon2
+    // * https://www.youtube.com/watch?v=Nyq4tqDNpnc
     // Hash our password using argon2
     // argon2id already salts our hash for increased security
     let hashedPassword = "";
@@ -60,9 +51,8 @@ export async function createUser(name, email, password) {
         hashedPassword = await argon2.hash(password, {
             type: argon2.argon2id,
         });
-        console.log(hashedPassword);
     } catch (error) {
-        console.log(error);
+        return error;
     }
 
     try {
@@ -72,6 +62,40 @@ export async function createUser(name, email, password) {
         );
         return user.rows[0];
     } catch (error) {
-        console.log(error);
+        return error;
     }
+}
+
+export async function loginUser(email, password) {
+    // check email & password have a value
+    if (!email || !password) {
+        throw Error("All fields must be filled");
+    }
+
+    // check if the email exists in our db
+    // query the db for email
+    const user = await query(`SELECT * FROM users WHERE user_email = $1;`, [
+        email,
+    ]);
+
+    // email already exists in our db
+    if (user.rows.length === 0) {
+        throw Error("Invalid login credentials");
+    }
+
+    // try to compare the given password to the hashedPassword
+    // argon2id decrypt
+    const hashedPassword = user.rows[0].user_password;
+    let verifiedHash = false;
+    try {
+        // check if password matches hashed password
+        verifiedHash = await argon2.verify(hashedPassword, password);
+    } catch (error) {
+        return error;
+    }
+    if (!verifiedHash) {
+        throw Error("Invalid login credentials");
+    }
+
+    return user.rows[0];
 }
