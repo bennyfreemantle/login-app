@@ -1,6 +1,7 @@
 import express from "express";
 import jwt from "jsonwebtoken";
-import { signUpUser, loginUser } from "../models/users.js";
+import { loginUser } from "../models/login.js";
+import { signUpUser } from "../models/signup.js";
 const userRouter = express.Router();
 
 const createToken = (id) => {
