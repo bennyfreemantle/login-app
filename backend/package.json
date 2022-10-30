@@ -1,0 +1,33 @@
+{
+  "name": "login-app",
+  "version": "1.0.0",
+  "description": "simple login / signup app",
+  "main": "app.js",
+  "type": "module",
+  "scripts": {
+    "start": "node -r dotenv/config app.js",
+    "dev": "nodemon -r dotenv/config app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bennyfreemantle/login-app.git"
+  },
+  "author": "benny freemantle",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bennyfreemantle/login-app/issues"
+  },
+  "homepage": "https://github.com/bennyfreemantle/login-app#readme",
+  "dependencies": {
+    "argon2": "^0.30.1",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "jsonwebtoken": "^8.5.1",
+    "morgan": "^1.10.0",
+    "pg": "^8.8.0",
+    "validator": "^13.7.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.20"
+  }
+}
