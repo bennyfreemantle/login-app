@@ -1,6 +1,6 @@
 # Login App
 
-### A simple Sing up and Login application to practice interacting with databases with express
+### A simple Sign up and Login application to practice interacting with databases with express
 
 ---
 
